@@ -33,7 +33,7 @@ for tr in tab.find_all('tr', id=lambda x: x and x.startswith('tr_')):
     print(slud_url, dat)
 ```
 
-Failu apstrāde un dublētu datu novēršana
+## Failu apstrāde un dublētu datu novēršana
 Programma pārbauda, vai izvēlētais Excel fails jau eksistē, un salīdzina tajā esošos sludinājumus ar jaunajiem datiem, lai novērstu dublēšanos. Tiek izmantotas sarakstu un vārdnīcu struktūras, lai nodrošinātu unikālu datu glabāšanu.
 ``` python
 if os.path.exists(filename):
@@ -63,6 +63,9 @@ for s in visi_slud:
     ws.append([s.url] + s.dati + [s.statuss])
 wb.save(filename)
 ```
+
+## Pielāgota kategoriju izvēle
+Papildus iepriekš definētajām kategorijām programma atbalsta arī pielāgotu saišu ievadi, kas ļauj veikt datu iegūšanu no jebkuras SS.lv sadaļas.
 
 # Izmantotās bibliotēkas
 
