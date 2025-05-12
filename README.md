@@ -99,6 +99,6 @@ Sekojiet norādēm, lai izvairītos no datu dublēšanas, ja fails jau eksistē.
 ## Piemērs:
 Ja izvēlēta Auto (Alfa Romeo) kategorija un fails nosaukts par “alfa_dati.xlsx”, programma iegūs visu noteikto sludinājumu datus un saglabās tos norādītajā .xslx failā.
 
-# Izmantotās datu struktūras:
+# Izmantotās datu struktūras
 
 
