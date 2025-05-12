@@ -2,8 +2,8 @@
 
 Projekta uzdevums ir izstrādāt Python programmu, kas automatizē datu iegūšanu no SS.lv sludinājumu portāla pēc lietotāja pieprasījuma, nodrošinot kategoriju izvēli. Pēc izvēles izdarīšanas programmai jāveic tīmekļa lapu parsēšana, datu filtrēšana un strukturēta saglabāšana .xslx tipa failā. Lietotajam ir jābūt izvēlei saglabāt datus augošā, dilstošā vai nesakārtotā secībā. Rezultātā lietotājam jābūt iespējai ērti analizēt tirgus tendences, salīdzināt cenas un sekot izmaiņām dažādās produktu kategorijās. Turklāt programmai jānovērš dublētu datu pievienošana, ja tiek izvēlēta viena un tā pati kategorija un jāapstrādā neparadzēta lietotāja ievade.
 
-# Galvenās Funkcijas
-## Kategoriju Izvēle
+# Galvenās funkcijas
+## Kategoriju izvēle
 
 Programma piedāvā vairākas iepriekš definētas kategorijas, piemēram, Auto (Alfa Romeo), Mēbeles (Mājas priekšmeti) un Suņi (Viss).
 Lietotājiem ir iespēja norādīt pielāgotu kategorijas saiti, kas ļauj izmantot skriptu arī citām produktu grupām.
@@ -17,7 +17,7 @@ categories = {
 }
 ```
 
-## Datu Iegūšana
+## Datu iegūšana
 Skripts izmanto requests bibliotēku, lai lejupielādētu tīmekļa lapu saturu, un BeautifulSoup, lai analizētu HTML kodu.
 Tas meklē sludinājumu URL, virsrakstus, cenas, un citas būtiskas detaļas, kas tiek saglabātas strukturētā formā Excel failā.
 Piemērs datu iegūšanai no HTML:
@@ -31,7 +31,7 @@ def extract_ads(soup):
     return ads
 ```
 
-## Failu Apstrāde un Dublētu Datu Novēršana
+## Failu apstrāde un dublētu datu novēršana
 
 Ja izvēlētais Excel fails jau eksistē, skripts pārbauda, vai jaunie URL jau nav saglabāti, lai novērstu dublēšanos.
 Tas tiek panākts, izmantojot set datu struktūru, kas nodrošina tikai unikālu vērtību glabāšanu.
@@ -43,7 +43,7 @@ else:
     existing_urls = set()
 ```
 
-## Datu Eksports uz Excel
+## Datu eksports uz excel
 Dati tiek saglabāti Excel failā, izmantojot OpenPyXL.
 Katrs sludinājums tiek pievienots kā jauna rinda ar atsevišķiem laukiem virsrakstam, cenai un URL.
 Piemērs datu saglabāšanai:
@@ -100,5 +100,8 @@ Sekojiet norādēm, lai izvairītos no datu dublēšanas, ja fails jau eksistē.
 Ja izvēlēta Auto (Alfa Romeo) kategorija un fails nosaukts par “alfa_dati.xlsx”, programma iegūs visu noteikto sludinājumu datus un saglabās tos norādītajā .xslx failā.
 
 # Izmantotās datu struktūras
-
+* Saraksti (list)
+* Simbolu virknes (string)
+* Vārdnīcas (dict), jo ```requests.get``` izmanto vārdnīcas: ```atb = requests.get(lapas_url, headers={'User-Agent':'Mozilla/5.0'})```python
+* Korteži (tuples)
 
