@@ -9,12 +9,12 @@ Programma piedāvā vairākas iepriekš definētas kategorijas, piemēram, Auto 
 Lietotājiem ir iespēja norādīt pielāgotu kategorijas saiti, kas ļauj izmantot skriptu arī citām produktu grupām.
 Kategorijas tiek glabātas vārdnīcā, nodrošinot vieglu piekļuvi un paplašināšanu:
 ``` python
-categories = {
-    "1": ("Auto (Alfa Romeo)", "https://www.ss.lv/lv/transport/cars/alfa-romeo/"),
-    "2": ("Darbs (Administrators)", "https://www.ss.lv/lv/home-stuff/furniture/"),
-    "3": ("Suņi (viss)", "https://www.ss.lv/lv/animals/dogs/"),
-    "4": ("Cita kategorija (ievadīt saiti)", None)
-}
+kategorijas = [
+        Category("Auto (Alfa Romeo)", "https://www.ss.lv/lv/transport/cars/alfa-romeo/"),
+        Category("Darbs (Administrators)", "https://www.ss.lv/lv/work/internet-services/administration/"),
+        Category("Suņi (viss)", "https://www.ss.lv/lv/animals/dogs/"),
+        Category("Cita (rokām ievadīt)", None)
+    ]
 ```
 
 ## Datu iegūšana
