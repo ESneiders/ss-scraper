@@ -102,6 +102,6 @@ Ja izvēlēta Auto (Alfa Romeo) kategorija un fails nosaukts par “alfa_dati.xl
 # Izmantotās datu struktūras
 * Saraksti (list)
 * Simbolu virknes (string)
-* Vārdnīcas (dict), jo ```requests.get``` izmanto vārdnīcas: ```atb = requests.get(lapas_url, headers={'User-Agent':'Mozilla/5.0'})```python
+* Vārdnīcas (dict), jo ```requests.get``` izmanto vārdnīcas: ```atb = requests.get(lapas_url, headers={'User-Agent':'Mozilla/5.0'})``` python
 * Korteži (tuples)
 
