@@ -1,141 +1,135 @@
+import requests
+from bs4 import BeautifulSoup
+import openpyxl
 import os
 import time
-import openpyxl
 
-class Sludinajums:
-    def __init__(self, url, cena, nosaukums, apraksts):
-        self.url = url
-        self.cena = cena
-        self.nosaukums = nosaukums
-        self.apraksts = apraksts
-        self.status = None  # Statuss: "Jauns", "None", "Izņemts"
-
-    def __str__(self):
-        return f"{self.nosaukums}: {self.cena} EUR - {self.url}"
-
-class Kategorija:
+class Category:
     def __init__(self, name, url):
         self.name = name
         self.url = url
 
-    def get_url(self):
-        return self.url
+class Sludinajums:
+    def __init__(self, url, dati, statuss):
+        self.url = url
+        self.dati = dati  #saraksts ar visiem laukiem
+        self.statuss = statuss
 
-class DatuApstrade:
-    def __init__(self, kategorija, file_name):
-        self.kategorija = kategorija
-        self.file_name = file_name
-        self.sludinajumi = []
-        self.old_urls = set()
-        self.load_old_data()
-
-    def load_old_data(self):
-        """ Ielādē esošos datus no Excel faila (vai citādi saglabātajiem datiem) """
-        if os.path.exists(self.file_name):
-            wb = openpyxl.load_workbook(self.file_name)
-            ws = wb.active
-            for row in ws.iter_rows(min_row=2, values_only=True):  # sāk no 2. rindas
-                url = row[0]
-                if url:
-                    self.old_urls.add(url)
-            wb.close()
-
-    def save_data(self):
-        """ Saglabā datus Excel failā """
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Sludinājumi"
-        
-        # Piešķir kolonnu nosaukumus
-        ws.append(["SAITE", "Cena", "Nosaukums", "Apraksts", "Status"])
-        
-        for sludinajums in self.sludinajumi:
-            ws.append([sludinajums.url, sludinajums.cena, sludinajums.nosaukums, sludinajums.apraksts, sludinajums.status])
-        
-        wb.save(self.file_name)  # Saglabā failu ar norādīto nosaukumu
-        print(f"Dati saglabāti kā: {self.file_name}")
-
-    def __init__(self, kategorija, file_name):
-        self.kategorija = kategorija
-        self.file_name = file_name
-        self.sludinajumi = []
-        self.old_urls = set()
-        self.load_old_data()
-
-    def load_old_data(self):
-        """ Ielādē esošos datus no Excel faila (vai citādi saglabātajiem datiem) """
-        if os.path.exists(self.file_name):
-            with open(self.file_name, 'r') as f:
-                lines = f.readlines()
-                for line in lines[1:]:  # Pārskaitām tikai datus pēc virsraksta
-                    data = line.strip().split(',')
-                    url = data[0]
-                    if url:
-                        self.old_urls.add(url)
-
-    def save_data(self):
-        """ Saglabā datus Excel failā (vienkāršota versija - CSV) """
-        with open(self.file_name, 'w', encoding='utf-8') as f:
-            f.write("SAITE," + "Cena,Nosaukums,Apraksts,Status\n")
-            for sludinajums in self.sludinajumi:
-                f.write(f"{sludinajums.url},{sludinajums.cena},{sludinajums.nosaukums},{sludinajums.apraksts},{sludinajums.status}\n")
-        print(f"Dati saglabāti kā: {self.file_name}")
-
-    def check_new_and_removed(self):
-        """ Pārbauda jaunus un izņemtus sludinājumus """
-        new_urls = set([s.url for s in self.sludinajumi])
-        for sludinajums in self.sludinajumi:
-            if sludinajums.url in self.old_urls:
-                sludinajums.status = "None"
-            else:
-                sludinajums.status = "Jauns"
-        
-        # Pārbauda vecos datus, kas vairs nav pieejami
-        removed_sludinajumi = [sl for sl in self.sludinajumi if sl.url not in new_urls]
-        for sl in removed_sludinajumi:
-            sl.status = "Izņemts"
-
-    def scrape_data(self, pages=1):
-        """ Šī funkcija parāda imitāciju sludinājumu ievākšanai no tīmekļa """
-        for page in range(1, pages + 1):
-            url = self.kategorija.get_url() + f"/page{page}.html" if page > 1 else self.kategorija.get_url()
-            print(f"Skata lapu: {url}")
-            time.sleep(1)  # Imitē ielādi
-
-            # Imitē datus no lapas
-            for i in range(5):  # Imitē 5 sludinājumus katrā lapā
-                sludinajums = Sludinajums(
-                    url=f"{url}/sludinajums_{i}",
-                    cena=100 + i * 10,  # Cena piemērs
-                    nosaukums=f"Sludinājums {i}",
-                    apraksts=f"Apraksts {i} par produktu"
-                )
-                self.sludinajumi.append(sludinajums)
-
-        self.check_new_and_removed()
+def dabut_cenu(slud_objekts, idx):
+    try:
+        cena = slud_objekts.dati[idx]
+        skaitli = ''.join(c for c in cena if c.isdigit())
+        return int(skaitli) if skaitli else 0
+    except:
+        return 0
 
 def main():
-    # Izvēle no kategorijām
     kategorijas = [
-        Kategorija("Auto (Alfa Romeo)", "https://www.ss.lv/lv/transport/cars/alfa-romeo/"),
-        Kategorija("Darbs (Administrators)", "https://www.ss.lv/lv/home-stuff/furniture/"),
-        Kategorija("Suņi (viss)", "https://www.ss.lv/lv/animals/dogs/"),
+        Category("Auto (Alfa Romeo)", "https://www.ss.lv/lv/transport/cars/alfa-romeo/"),
+        Category("Darbs (Administrators)", "https://www.ss.lv/lv/work/internet-services/administration/"),
+        Category("Suņi (viss)", "https://www.ss.lv/lv/animals/dogs/"),
+        Category("Cita (rokām ievadīt)", None)
     ]
-    
-    print("Izvēlieties kategoriju:")
-    for idx, cat in enumerate(kategorijas, 1):
-        print(f"{idx}. {cat.name}")
 
-    choice = int(input("Ievadiet numuru: ")) - 1
-    selected_cat = kategorijas[choice]
+    for i, x in enumerate(kategorijas):
+        print(i+1, "-", x.name)
+    izvele = int(input("Kategorijas Nr.: ")) - 1
+    if kategorijas[izvele].url is not None:
+        url = kategorijas[izvele].url
+    else:
+        url = input("Ievadi saiti: ").strip()
+    filename = input("Faila nosaukums: ").strip()
+    if not filename.endswith(".xlsx"):
+        filename += ".xlsx"
 
-    file_name = input("Ievadiet Excel faila nosaukumu (piem. dati.csv): ").strip()
-    datu_apstrade = DatuApstrade(selected_cat, file_name)
+    vecie_url = []
+    vecie_slud = []
 
-    pages = int(input("Cik lapas pārbaudīt? "))
-    datu_apstrade.scrape_data(pages)
-    
-    datu_apstrade.save_data()
+    if os.path.exists(filename):
+        wb = openpyxl.load_workbook(filename)
+        ws = wb.active
+        head = ws['A1'].value or ""
+        iepr_url = ""
+        if head.startswith("SAITE:"):
+            iepr_url = head[6:]
+        if iepr_url.strip() != url.strip():
+            print("Faila citas kategorijas saite!")
+            return
+        for rinda in ws.iter_rows(min_row=2, values_only=True):
+            if rinda and rinda[0]:
+                vecie_url.append(rinda[0])
+                vecie_slud.append(Sludinajums(rinda[0], list(rinda[1:-1]), rinda[-1]))
+        wb.close()
 
-if __name__ == "__main__":
+    lapas = int(input("Cik lapas pārbaudīt? "))
+    header = []
+    visi_slud = []
+
+    for lapa in range(1, lapas+1):
+        if lapa == 1:
+            lapas_url = url
+        else:
+            lapas_url = url.rstrip("/") + "/page" + str(lapa) + ".html"
+        atb = requests.get(lapas_url, headers={'User-Agent':'Mozilla/5.0'})
+        html = BeautifulSoup(atb.text, 'html.parser')
+        tab = None
+        for t in html.find_all('table'):
+            if t.find_all('tr', id=lambda x: x and x.startswith('tr_')):
+                tab = t
+                break
+        if not tab: break
+        if not header:
+            galv = tab.find('tr', id='head_line')
+            if galv:
+                for td in galv.find_all(['td','th']):
+                    txt = td.get_text(" ",strip=True)
+                    if txt and "Sludinājumi" not in txt:
+                        header.append(txt)
+        for tr in tab.find_all('tr', id=lambda x: x and x.startswith('tr_')):
+            tds = tr.find_all('td')
+            slud_url = ""
+            for td in tds:
+                a = td.find('a')
+                if a and '/msg/' in str(a.get('href')):
+                    slud_url = "https://www.ss.lv" + a['href']
+            if not slud_url:
+                continue
+            offset = len(tds) - len(header)
+            dat = []
+            for j in range(len(header)):
+                idx = j+offset
+                dat.append(tds[idx].get_text(" ",strip=True) if (0<=idx<len(tds)) else "")
+            statuss = "Jauns" if slud_url not in vecie_url else "None"
+            visi_slud.append(Sludinajums(slud_url, dat, statuss))
+        time.sleep(1)
+
+    #vecie kas vairs nav
+    atrastie_url = [x.url for x in visi_slud]
+    for x in vecie_slud:
+        if x.url not in atrastie_url:
+            x.statuss = "Izņemts"
+            visi_slud.append(x)
+
+    #cenas kartosana
+    price_idx = None
+    for idx, nos in enumerate(header):
+        if "cena" in nos.lower() or "цена" in nos.lower():
+            price_idx = idx
+            break
+    if price_idx is not None:
+        kart = input("Kārtot pēc cenas? (1-augoši, 2-dilstoši, Enter-ne): ").strip()
+        if kart in ["1","2"]:
+            visi_slud.sort(key=lambda x: dabut_cenu(x, price_idx), reverse=(kart=="2"))
+
+    #saglabasana
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws["A1"] = "SAITE:" + url
+    ws.append(["url"]+header+["Status"])
+    for s in visi_slud:
+        ws.append([s.url] + s.dati + [s.statuss])
+    wb.save(filename)
+    print("Gatavs, dati ierakstīti:", filename)
+
+if __name__ == '__main__':
     main()
