@@ -1,4 +1,4 @@
-# Projekta Uzdevums
+# Projekta uzdevums
 
 Projekta uzdevums ir izstrādāt Python programmu, kas automatizē datu iegūšanu no SS.lv sludinājumu portāla pēc lietotāja pieprasījuma, nodrošinot kategoriju izvēli. Pēc izvēles izdarīšanas programmai jāveic tīmekļa lapu parsēšana, datu filtrēšana un strukturēta saglabāšana .xslx tipa failā. Lietotajam ir jābūt izvēlei saglabāt datus augošā, dilstošā vai nesakārtotā secībā. Rezultātā lietotājam jābūt iespējai ērti analizēt tirgus tendences, salīdzināt cenas un sekot izmaiņām dažādās produktu kategorijās. Turklāt programmai jānovērš dublētu datu pievienošana, ja tiek izvēlēta viena un tā pati kategorija un jāapstrādā neparadzēta lietotāja ievade.
 
